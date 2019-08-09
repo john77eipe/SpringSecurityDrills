@@ -5,7 +5,7 @@ import javax.servlet.Filter;
 import com.securestore.ApplicationOAuth1;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
-public class WebInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
+public class WebInitializer { /*extends AbstractAnnotationConfigDispatcherServletInitializer {
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
@@ -27,5 +27,5 @@ public class WebInitializer extends AbstractAnnotationConfigDispatcherServletIni
     	Filter [] singleton = { new CORSFilter()};
     	return singleton;
     }
-
+*/
 }

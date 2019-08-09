@@ -70,7 +70,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .accessTokenValiditySeconds(120)
                 .refreshTokenValiditySeconds(600)
                 .autoApprove(true)
-                .redirectUris("http://localhost:8083/client/login/oauth2/code/custom");//Refresh token is only valid for 10 minutes.
+                .redirectUris("http://localhost:8083/client/login/oauth2/code/custom");
+        //Refresh token is only valid for 10 minutes.
     }
 
     @Override
@@ -89,11 +90,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .allowFormAuthenticationForClients();;
     }
 
-    
-    /*@Override
-	public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-		oauthServer.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
-	}*/
+
 
     @Bean
     @SuppressWarnings("deprecation")
