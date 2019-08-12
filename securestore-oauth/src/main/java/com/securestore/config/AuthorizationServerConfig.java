@@ -63,14 +63,15 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 
         clients.inMemory()
                 .withClient(CLIENT_ID)
-                .authorizedGrantTypes("authorization_code", "password", "refresh_token", "implicit")
+                .authorizedGrantTypes("authorization_code", "password", "refresh_token")
                 //.authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
                 .scopes("user_info", "read", "write", "trust")
                 .secret(passwordEncoder1.encode(CLIENT_SECRET))
                 .accessTokenValiditySeconds(120)
                 .refreshTokenValiditySeconds(600)
                 .autoApprove(true)
-                .redirectUris("http://localhost:8083/client/login/oauth2/code/custom");
+                .redirectUris("http://localhost:8082/app1/login/oauth2/code/my-auth-server", "http://localhost:8083/app2/login/oauth2/code/my-auth-server");
+        //redirect uris matter only for authorization_code and not for password grant type
         //Refresh token is only valid for 10 minutes.
     }
 

@@ -1,0 +1,35 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /app1
+
+spring:
+  security:
+      basic:
+        enabled: false
+
+
+      oauth2:
+          client:
+              registration:
+                  custom:
+                      client-id: my-client
+                      client-secret: my-secret
+                      authorization-grant-type: authorization_code
+                      # redirectUri : <client_url>/login/oauth2/code/<provider_name>  (default)
+                      redirectUri: http://localhost:8082/app1/login/oauth2/code/my-auth-server
+                      provider: my-auth-server
+              provider:
+                  my-auth-server:
+                      # authorizationUri: <authorization_server_url>/oauth/authorize  (default)
+                      authorization-uri: http://localhost:8085/securestore/oauth/authorize
+                      # tokenUri: <authorization_server_url>/oauth/token  (default)
+                      token-uri: http://localhost:8085/securestore/oauth/token
+                      # userInfoUri: <resource_server_url>/me  (default)
+                      user-info-uri: http://localhost:8085/securestore/rest/user/me
+                      user-name-attribute: username
+                      logoutSuccessUrl: http://localhost:8085/securestore/logout
+
+
+  thymeleaf:
+      cache: false

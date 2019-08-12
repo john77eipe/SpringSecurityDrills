@@ -1,6 +1,7 @@
 package com.securestore.resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.securestore.domain.CustomSecurityUser;
 import com.securestore.domain.UserAccount;
 import com.securestore.service.UserAccountDetailsService;
 import com.securestore.service.impl.UserAccountDetailsServiceImpl;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +34,34 @@ public class UserResourceController {
     UserAccountDetailsService userAccountDetailsService;  //Service which will do all data retrieval/manipulation work
 
     @RequestMapping("/user/me")
-    public Principal user(Principal principal) {
+    public Principal user(Principal principal, UserDetailsService userAccountDetailsService) {
+
+        /**
+         * it is not necessary to hit the userAccountdetailsService
+         * just doing it again for fun
+         */
+        CustomSecurityUser userDetails = (CustomSecurityUser)userAccountDetailsService.loadUserByUsername(principal.getName());
+
+        if (userDetails == null) {
+            System.out.println("User with name " + userDetails.getName() + " not found");
+            //return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        System.out.println("----principal----");
+        System.out.println("userDetails.toString() : " + userDetails.toString());
+        System.out.println("userDetails.getName() : " + userDetails.getName());
+        System.out.println();
+
+        System.out.println("----authentication----");
+        System.out.println("userDetails.getAuthorities() : " + userDetails.getAuthorities());
+        System.out.println("userDetails.getUsername() : " + userDetails.getUsername());
+        System.out.println("userDetails.getPassword : " + userDetails.getPassword());
+        System.out.println();
+
+        System.out.println("----custom authentication----");
+        System.out.println("userDetails.getName() : " + userDetails.getName());
+        System.out.println("userDetails.getAge() : " + userDetails.getAge());
+
         return principal;
     }
 
@@ -42,7 +72,7 @@ public class UserResourceController {
 
     //-------------------Retrieve All Users--------------------------------------------------------
 
-    @RequestMapping(value = "/user", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/all", method = RequestMethod.GET)
     @PreAuthorize("hasRole('HRADMIN')")
     public ResponseEntity<List<UserAccount>> listAllUsers() {
         List<UserAccount> users = userAccountDetailsService.findAllUsers();

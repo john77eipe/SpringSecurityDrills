@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="http://www.thymeleaf.org"
+        lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Spring Security SSO Client 2</title>
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" />
+</head>
+
+<body>
+<div class="container">
+    <div class="col-sm-12">
+        <h1>Spring Security SSO Client 2</h1>
+        <div sec:authorize="isAuthenticated()">
+            <!-- Principal name -->
+            username:
+            <span sec:authentication="name"></span>
+
+            email:
+            <span sec:authentication="principal.email"></span>
+            <span sec:authorize="hasAuthority('ADMIN')">(ADMIN)</span>
+
+        </div>
+
+        <div sec:authorize="!isAuthenticated()">
+            <a href="#" th:href="@{/oauth2/authorization/my-auth-server}"> Login </a>
+        </div>
+    </div>
+    </div>
+</div>
+</body>
+</html>

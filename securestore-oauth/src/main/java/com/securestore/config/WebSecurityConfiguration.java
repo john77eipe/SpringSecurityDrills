@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -74,14 +75,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .anonymous().disable()
 
                 .requestMatchers()
-                .antMatchers("/login", "/oauth/authorize")
+                .antMatchers(HttpMethod.POST, "/login")
+                .antMatchers(HttpMethod.POST, "/logout")
+                .antMatchers("/oauth/authorize")
                 .and()
 
 			.authorizeRequests()
                 .antMatchers("/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .antMatchers("/oauth/token").permitAll()
-            .antMatchers("/userPage/*").hasAnyRole("USER", "HRADMIN")
-            .antMatchers("/adminPage/*").hasRole("HRADMIN")
+            .antMatchers(HttpMethod.GET,"/userPage/*").hasAnyRole("USER", "HRADMIN")
+            .antMatchers(HttpMethod.GET, "/adminPage/*").hasRole("HRADMIN")
 
                 .anyRequest().authenticated()
                 .and()
