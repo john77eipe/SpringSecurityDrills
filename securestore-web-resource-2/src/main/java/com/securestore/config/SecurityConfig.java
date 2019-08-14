@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,9 +41,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .antMatcher("/**")
                 .authorizeRequests()
-                .antMatchers("/**").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/", "/login**")
+                .permitAll()
                 .and()
                 .oauth2Login()
                 .userInfoEndpoint()
