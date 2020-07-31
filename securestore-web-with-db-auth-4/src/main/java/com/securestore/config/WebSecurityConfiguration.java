@@ -27,6 +27,7 @@ import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -58,20 +59,21 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		httpSecurity
 		.csrf().disable()
 		.authorizeRequests()
-			.antMatchers("/rest/user/**").hasAnyRole("USER", "HRADMIN", "SUPERADMIN")
-			.antMatchers("/userPage/*").hasAnyRole("USER", "HRADMIN")
-	        .antMatchers("/adminPage/*").hasRole("HRADMIN")
-	        .antMatchers("/login*").permitAll()
+			.antMatchers("/rest/user/**").hasAnyRole("USER", "ADMIN", "SUPERADMIN")
+			.antMatchers("/userPage/**").hasAnyRole("USER", "ADMIN")
+	        .antMatchers("/adminPage/**").hasRole("ADMIN")
+	        .antMatchers("/loginPage").permitAll()
 	        .antMatchers("/**", "/css/**", "/js/**", "/images/**").permitAll()
 	        .and()
 	        .formLogin()
-		        .loginPage("/")
+		        .loginPage("/loginPage")
 		        .loginProcessingUrl("/login")
 	        .failureHandler(authenticationFailureHandler)
 	        .successHandler(authenticationSuccessHandler)
 	        .and()
 		        .logout()
-		        .logoutUrl("/logout")
+				.logoutRequestMatcher(new AntPathRequestMatcher("/logout**"))
+				.logoutSuccessUrl("/")
 	        .deleteCookies("JSESSIONID");
     }
 

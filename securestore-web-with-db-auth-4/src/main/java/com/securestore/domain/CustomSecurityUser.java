@@ -10,10 +10,13 @@ public class CustomSecurityUser extends UserAccount implements UserDetails {
 	}
 
 	public CustomSecurityUser(UserAccount user) {
+		//these setter calls are needed
 		this.setAuthorities(user.getAuthorities());
 		this.setId(user.getId());
 		this.setPassword(user.getPassword());
 		this.setUsername(user.getUsername());
+		this.setName(user.getName());
+		this.setAge(user.getAge());
 	}
 
 	@Override

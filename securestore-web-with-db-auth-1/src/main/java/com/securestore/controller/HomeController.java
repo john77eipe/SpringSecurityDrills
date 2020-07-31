@@ -15,7 +15,7 @@ public class HomeController {
     }
     
     @RequestMapping("/special")
-    @PreAuthorize("hasRole('HRADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public @ResponseBody String jsonResponse() {
     	return "{'data':'hello'}";
     }

@@ -7,7 +7,7 @@
 	</root>
 
 
-    <logger name="com.springlabs.pizzastore" level="DEBUG"/>
+    <logger name="com.securestore" level="DEBUG"/>
 
 	<logger name="org.springframework" level="DEBUG"/>
 

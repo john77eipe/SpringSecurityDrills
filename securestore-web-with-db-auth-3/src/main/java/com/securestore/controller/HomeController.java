@@ -13,9 +13,9 @@ public class HomeController {
     public String viewHome() {
         return "index";
     }
-    
+
     @RequestMapping("/special")
-    @PreAuthorize("hasRole('HRADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public @ResponseBody String jsonResponse() {
     	return "{'data':'hello'}";
     }

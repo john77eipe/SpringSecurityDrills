@@ -47,32 +47,32 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		//Note that the order of the antMatchers() elements is significant 
 		//the more specific rules need to come first, followed by the more general ones
 		httpSecurity.csrf().disable().authorizeRequests()
-                .antMatchers("/user/**").hasAnyRole("USER", "HRADMIN")
-                .antMatchers("/admin").hasRole("HRADMIN")
+                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/admin").hasRole("ADMIN")
                 .antMatchers("/login*").permitAll()
                 .antMatchers("/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/")
-                .loginProcessingUrl("/login")
+                	.loginPage("/")
+                	.loginProcessingUrl("/login")
                 .failureHandler(authenticationFailureHandler)//.failureUrl("/?login_error") //using handler for debugging
                 .successHandler(authenticationSuccessHandler)
                 .and()
-                .logout()
-                .logoutUrl("/logout")
-                .deleteCookies("JSESSIONID");
+                	.logout()
+                	.logoutUrl("/logout")
+                	.deleteCookies("JSESSIONID");
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
     	
     	auth.inMemoryAuthentication()
-        .withUser("user1").password("{noop}user1Pass").roles("USER")
+        	.withUser("user1").password("{noop}user1Pass").roles("USER")
         .and()
-        .withUser("user2").password("{noop}user2Pass").roles("USER")
+        	.withUser("user2").password("{noop}user2Pass").roles("USER")
         .and()
-        .withUser("admin").password("{noop}adminPass").roles("HRADMIN");
+        	.withUser("admin").password("{noop}adminPass").roles("ADMIN");
     }
     
 }

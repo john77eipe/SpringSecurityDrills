@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.siriuscom</groupId>
-	<artifactId>securestore-web-with-ldap-auth</artifactId>
+	<artifactId>securestore-web-with-db-auth-2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>securestore</name>
 	<description>Demo project for Spring Boot</description>

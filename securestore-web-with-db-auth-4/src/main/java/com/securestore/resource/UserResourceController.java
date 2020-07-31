@@ -29,7 +29,7 @@ public class UserResourceController {
     //-------------------Retrieve All Users--------------------------------------------------------
 
     @RequestMapping(value = "/user", method = RequestMethod.GET)
-    @PreAuthorize("hasRole('HRADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserAccount>> listAllUsers() {
         List<UserAccount> users = userAccountDetailsService.findAllUsers();
         if (users.isEmpty()) {
@@ -58,7 +58,7 @@ public class UserResourceController {
     //-------------------Create a User--------------------------------------------------------
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    @PreAuthorize("hasRole('HRADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> createUser(@RequestBody UserAccount user, UriComponentsBuilder ucBuilder) {
         System.out.println("Creating User " + user.getName());
 
@@ -78,7 +78,7 @@ public class UserResourceController {
     //------------------- Update a User --------------------------------------------------------
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.PUT)
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('SUPERADMIN')")
     public ResponseEntity<UserAccount> updateUser(@PathVariable("id") long id, @RequestBody UserAccount user) {
         System.out.println("Updating User " + id);
 
@@ -99,7 +99,7 @@ public class UserResourceController {
     //------------------- Delete a User --------------------------------------------------------
 
     @RequestMapping(value = "/user/{id}", method = RequestMethod.DELETE)
-    @PreAuthorize("hasRole('HRUSER')")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<UserAccount> deleteUser(@PathVariable("id") long id) {
         System.out.println("Fetching & Deleting User with id " + id);
 

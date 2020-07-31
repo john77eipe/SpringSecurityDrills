@@ -1,6 +1,10 @@
 package com.securestore.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -54,7 +58,7 @@ public class UserAccount {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
@@ -77,5 +81,15 @@ public class UserAccount {
 
 	public void setAge(int age) {
 		this.age = age;
+	}
+
+	//just for fun
+	public static String displayEncryptedPassword(){
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (!(authentication instanceof AnonymousAuthenticationToken)) {
+			CustomSecurityUser customSecurityUser = (CustomSecurityUser)  authentication.getPrincipal();
+			return customSecurityUser.getPassword();
+		}
+		return "fools die hard";
 	}
 }

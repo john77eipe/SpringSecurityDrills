@@ -52,8 +52,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		httpSecurity
 		.csrf().disable()
 		.authorizeRequests()
-	        .antMatchers("/user/**").hasAnyRole("USER", "HRADMIN")
-	        .antMatchers("/admin").hasRole("HRADMIN")
+	        .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+	        .antMatchers("/admin").hasRole("ADMIN")
 	        .antMatchers("/login*").permitAll()
 	        .antMatchers("/**", "/css/**", "/js/**", "/images/**").permitAll()
 	        .anyRequest().authenticated()
@@ -77,7 +77,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         .and()
         .withUser("user2").password("$2a$10$56m9EsnRh4TEGOj19gIuEu54RMxMob.09uP/xCwqPEgDSdmq0GaFq").roles("USER")
         .and()
-        .withUser("admin").password("$2a$10$yDEiqCrIbm71W9AQTcxphOI7EB65o3uur6/hSN96N6GhHHIsr/pC6").roles("HRADMIN");
+        .withUser("admin").password("$2a$10$yDEiqCrIbm71W9AQTcxphOI7EB65o3uur6/hSN96N6GhHHIsr/pC6").roles("ADMIN");
     }
     
     @Bean

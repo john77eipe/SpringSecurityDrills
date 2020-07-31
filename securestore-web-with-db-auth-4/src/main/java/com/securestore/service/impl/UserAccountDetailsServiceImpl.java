@@ -47,7 +47,15 @@ public class UserAccountDetailsServiceImpl implements UserAccountDetailsService 
 
 	@Override
 	public boolean isUserExist(UserAccount user) {
-		return userRepository.existsById(user.getId());
+		boolean userExists = false;
+		if (user.getId() != null && user.getId() != 0) {
+			userExists = userRepository.existsById(user.getId());
+		} else {
+			if (userRepository.findByUsername(user.getUsername()) != null) {
+				userExists = true;
+			}
+		}
+		return userExists;
 	}
 
 	@Override
