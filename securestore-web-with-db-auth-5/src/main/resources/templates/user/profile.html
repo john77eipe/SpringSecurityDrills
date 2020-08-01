@@ -1,0 +1,29 @@
+<html
+        xmlns:th="https://www.thymeleaf.org"
+        xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+
+</head>
+<body>
+<h2>User Profile Page</h2>
+<div sec:authorize="isAuthenticated()">
+    Hooraay!! you are a authenticated person.
+</div>
+<div sec:authorize="hasRole('ROLE_USER')">
+    Profile details for authenticated person who has USER role: <br/>
+
+    Authenticated as <span sec:authentication="name"></span>
+    Username is <span sec:authentication="principal.username"></span>
+    Name is <span sec:authentication="principal.name"></span>
+    Age is <span sec:authentication="principal.age"></span>
+    Domain is <span sec:authentication="principal.domain"></span>
+    <!--
+    Another approach:
+
+    <th:block th:with="auth=${#authentication.getPrincipal()}">
+        Age is <span th:text="${auth!=null? auth.age : 'NULL'}"></span>
+    </th:block>
+    -->
+</div>
+</body>
+</html>
