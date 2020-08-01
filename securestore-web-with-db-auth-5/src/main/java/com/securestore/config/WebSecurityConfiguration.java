@@ -30,7 +30,9 @@ import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -56,12 +58,17 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-       
+
+		RememberMeServices rememberMeServices = new CustomTokenBasedRememberMeServices("uniqueAndSecret", userDetailsService);
     	
 		//Note that the order of the antMatchers() elements is significant 
 		//the more specific rules need to come first, followed by the more general ones
 		httpSecurity
 		.csrf().disable()
+				.addFilterBefore(
+						new RememberMeAuthenticationFilter(
+								authenticationManagerBean(),
+								rememberMeServices), RememberMeAuthenticationFilter.class)
 				.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 		.authorizeRequests()
 			.antMatchers("/rest/user/**").hasAnyRole("USER", "ADMIN", "SUPERADMIN")
@@ -79,7 +86,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		        .logout()
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout**"))
 				.logoutSuccessUrl("/")
-	        .deleteCookies("JSESSIONID")
+	        	.deleteCookies("JSESSIONID")
+			.and()
+				.rememberMe()
+				.rememberMeParameter("rememberMe")
+				.rememberMeServices(rememberMeServices)
 			.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 			.and()
@@ -94,7 +105,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     
     @Bean
     PasswordEncoder passwordEncoder() {
-    	return new BCryptPasswordEncoder();
+    	return new BCryptPasswordEncoder(); //or use custom implementation new PasswordEncryption()
     }
     
     @Override
