@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -78,7 +79,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		        .logout()
 				.logoutRequestMatcher(new AntPathRequestMatcher("/logout**"))
 				.logoutSuccessUrl("/")
-	        .deleteCookies("JSESSIONID");
+	        .deleteCookies("JSESSIONID")
+			.and()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+			.and()
+				.sessionManagement().maximumSessions(1);
     }
 
     @Override
