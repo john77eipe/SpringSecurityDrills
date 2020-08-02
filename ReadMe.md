@@ -285,7 +285,7 @@ Checkout the project: **securestore-web-with-db-auth-3**
 
 
 
-## Part 4: Secure Web with DB Authentication and Authorization with encryption
+## Part 4: Secure Web and HTTP(Ajax) endpoints with DB Authentication and Authorization with encryption; CSRF; Remember-Me Cookie
 
 The same as above but with rest endpoints added. 
 
@@ -371,9 +371,69 @@ Hibernate: select useraccoun0_.id as id1_1_0_, authoritie1_.id as id1_0_1_, user
 
 ```
 
+#### Cross-Site-Request-Forgery: CSRF
+
+If you are completely new to CSRF, you might want to watch [this YouTube video](https://www.youtube.com/watch?v=vRBihr41JTo) to get up to speed with it. 
+
+##### CSRF & Server-Side Rendered HTML
+
+Imagine a bank transfer form or any form (like a login form) for that matter, that gets rendered by your @Controllers with the help of a templating technology like Thymeleaf or Freemarker.
+
+```html
+<form action="/transfer" method="post">  <!-- 1 -->
+  <input type="text" name="amount"/>
+  <input type="text" name="routingNumber"/>
+  <input type="text" name="account"/>
+  <input type="submit" value="Transfer"/>
+</form>
+```
+
+With Spring Security enabled, you **won’t be able to submit that form anymore**. 
+
+Because Spring Security’s CSRFFilter is looking for an *additional hidden parameter* on **any POST** (PUT/DELETE) request: a so-called CSRF token.
+
+It generates such a token, by default, *per HTTP session* and stores it there. And you need to make sure to inject it into any of your HTML forms.
+
+#### CSRF Tokens & Thymeleaf
+
+As Thymeleaf has good integration with Spring Security (when used together with Spring Boot), you can simply add the following snippet to any form and you’ll get the token injected automatically, from the session, into your form. Even better, if you are using "th:action" for your form, Thymeleaf will *automatically* inject that hidden field for you, without having to do it manually.
+
+```html
+<form action="/transfer" method="post">  <!-- 1 -->
+  <input type="text" name="amount"/>
+  <input type="text" name="routingNumber"/>
+  <input type="text" name="account"/>
+  <input type="submit" value="Transfer"/>
+  <input 
+  type="hidden" 
+  th:name="${_csrf.parameterName}" 
+  th:value="${_csrf.token}" />
+</form>
+
+<!-- OR -->
+
+<form th:action="/transfer" method="post">  <!-- 2 -->
+  <input type="text" name="amount"/>
+  <input type="text" name="routingNumber"/>
+  <input type="text" name="account"/>
+  <input type="submit" value="Transfer"/>
+</form>
+```
+
+1. Here, we are adding the CSRF parameter manually.
+2. Here, we are using Thymeleaf’s form support.
+
+Note that I have enabled it in this project alone. Enabling it is as simple as removing the `.csrf().disable();` line.
+
+CSRF is not needed for stateless session setup like token authorisation (eg.  JWT). It can be disabled.
+
+For testing CSRF have a look [here](https://www.baeldung.com/spring-security-csrf).
+
 Checkout the project: **securestore-web-with-db-auth-4**.
 
-## Part 5: Custom authentication; Custom Encryption; Session Management; CSRF
+
+
+## Part 5: Custom authentication; Custom Encryption; Session Management
 
 Checkout the project: **securestore-web-with-db-auth-5**.
 

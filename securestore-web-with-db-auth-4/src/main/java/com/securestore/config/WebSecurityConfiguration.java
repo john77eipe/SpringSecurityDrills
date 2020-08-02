@@ -57,7 +57,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 		//Note that the order of the antMatchers() elements is significant 
 		//the more specific rules need to come first, followed by the more general ones
 		httpSecurity
-		.csrf().disable()
+		//.csrf().disable()
 		.authorizeRequests()
 			.antMatchers("/rest/user/**").hasAnyRole("USER", "ADMIN", "SUPERADMIN")
 			.antMatchers("/userPage/**").hasAnyRole("USER", "ADMIN")

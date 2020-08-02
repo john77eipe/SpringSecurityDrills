@@ -48,6 +48,10 @@
                         <input type="submit" id="submit" value="Login" name="submit" class="btn btn-primary btn-login" />
                     </div>
                 </div>
+                <input
+                    type="hidden"
+                    th:name="${_csrf.parameterName}"
+                    th:value="${_csrf.token}" />
 
             </fieldset>
         </form>
