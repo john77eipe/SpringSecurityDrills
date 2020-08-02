@@ -528,9 +528,40 @@ Remember Me cookie with more security is Persisted Spring Security have a look h
 
 https://github.com/eugenp/tutorials/tree/master/spring-security-modules/spring-security-mvc-persisted-remember-me
 
-## Part 6:  Secure REST 
+## Part 6:  Secure REST (Stateless Sessions)
 
-> In progress
+There are multiple options to choose from:
+
+1. Basic - the simplest with least features
+
+2. Digest - exotic, complex but not very widely used now (([spring-digest-impl-sample](https://github.com/sumit-samaddar/spring-rest-with-digest-authentication)))
+
+3. Bearer tokens - some custom implementation or JWT
+
+A good comparison post is [here](https://www.securitydrops.com/the-web-api-authentication-guide/)
+
+### Stateful to Stateless : Simple approach 
+
+If you already have a web app based on Stateful sessions then most obvious idea would be to send our session object’s content **back to the client** and have them stored in, say, a cookie. They would of course be **encrypted by the server** before sending, so that no prying eyes would be able to read them.
+When querying the server, the client would send that encrypted cookie along with the intended request. The server would then decrypt the cookie’s content and consequently verify the obtained credentials. Since the server had previously encrypted the cookie’s content using its own **secret key**, we are pretty sure that the credentials obtained are authentic unless the secret key is leaked, that is.
+
+This approach has been made pretty much straightforward thanks to contributions [like this one](https://github.com/lawrence0819/java-stateless-http-session), which allows you to intercept the session’s content, encrypt it and send it to the browser as a cookie.
+
+### Stateful to Stateless : JWT approach
+
+JWT is nothing is mostly same as above but in a standardized approach.
+
+**JWT** (JSON Web Tokens) is the **open standard** version of that concept: a **JSON-based** solution for creating secure tokens that contain a certain amount of **claims**, such as “I am indeed logged”, “I have administration rights”, etc. 
+
+These tokens are standard, compact, **encrypted** and **signed** by the emitting entity so that whoever receives them can ensure they are legitimate.
+
+As such, they can be perfectly used for authenticating a web or mobile application to a server exposing a RESTful API.
+
+One of the major advantages of JWT compared to session content’s serialization is that it can be used by any language or technology that can handle JSON, including Java, .NET, JavaScript, Python.
+
+ Just point your browser to https://jwt.io/ and have a look at the amount and variety of libraries available to generate, sign and verify JWT tokens! 
+
+
 
 
 

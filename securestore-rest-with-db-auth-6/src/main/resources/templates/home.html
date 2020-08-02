@@ -1,0 +1,21 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" type="text/css"></link>
+    <link th:href="@{/css/layout.css}" rel="stylesheet" type="text/css"></link>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Home sweet Home</h1>
+        <h2>If you are authenticated you will see a logout else login</h2>
+        <h3>
+            <a th:href="@{/loginPage}">login</a>
+            <a th:href="@{/logout}">logout</a>
+        </h3>
+        <script type="text/javascript" th:src="@{/js/jquery-3.1.0.min.js}"></script>
+        <script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+    </div>
+</body>
+
+</html>
