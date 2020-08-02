@@ -625,7 +625,9 @@ One of the major advantages of JWT compared to session content’s serialization
 
 
 
-## Part 7: OAuth
+## Part 7: Secure OAuth (DB Authentication and Authorization with encryption)
+
+### OAuth
 
 The [OAuth 2.0 specification](http://tools.ietf.org/html/rfc6749) is a flexibile authorization framework that describes a number of grants (“methods”) for a client application to acquire an access token (which represents a user’s permission for the client to access their data) which can be used to authenticate a request to an API endpoint.
 
@@ -746,9 +748,9 @@ Thereafter, the client application will use the access token for requesting reso
 
 
 
+For the usecase that we are working on. Let's consider
 
-
-### Part 6: Secure OAuth  DB Authentication and Authorization with encryption
+> **Work in progress. Ignore the below notes.**
 
 We are persisting user and role information and using that to authenticate a user. 
 
