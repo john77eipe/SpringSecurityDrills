@@ -58,7 +58,7 @@ public class UserAccount {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	@JsonIgnore
+
 	public String getPassword() {
 		return password;
 	}
@@ -91,5 +91,17 @@ public class UserAccount {
 			return customSecurityUser.getPassword();
 		}
 		return "fools die hard";
+	}
+
+	@Override
+	public String toString() {
+		return "UserAccount{" +
+				"id=" + id +
+				", username='" + username + '\'' +
+				", password='" + password + '\'' +
+				", name='" + name + '\'' +
+				", age=" + age +
+				", authorities=" + authorities +
+				'}';
 	}
 }

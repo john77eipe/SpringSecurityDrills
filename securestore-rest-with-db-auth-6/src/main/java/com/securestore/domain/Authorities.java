@@ -46,4 +46,6 @@ public class Authorities implements GrantedAuthority {
 	public void setUserAccount(UserAccount userAccount) {
 		this.userAccount = userAccount;
 	}
+
+	//public Authorities builder()
 }

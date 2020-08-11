@@ -1,9 +1,9 @@
 package com.securestore.resource;
 
 import com.securestore.config.JwtUtils;
+import com.securestore.domain.Authorities;
 import com.securestore.domain.CustomSecurityUser;
 import com.securestore.domain.UserAccount;
-import com.securestore.repository.UserRepository;
 import com.securestore.service.impl.UserAccountDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,7 +36,7 @@ public class UserAuthController {
 
 
     @Autowired
-    PasswordEncoder encoder;
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     JwtUtils jwtUtils;
@@ -61,15 +63,31 @@ public class UserAuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserAccount userAccount) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
 
         // Create new user's account
-        System.out.println("Creating User " + userAccount.getName());
+        System.out.println("Creating User " + signupRequest);
 
-        if (userAccountDetailsService.isUserExist(userAccount)) {
-            System.out.println("A User with name " + userAccount.getName() + " already exist");
+        if (userAccountDetailsService.isUserExistByUsername(signupRequest.getUsername())) {
+            System.out.println("A User with username: " + signupRequest.getUsername() + " already exist");
             return new ResponseEntity<Void>(HttpStatus.CONFLICT);
         }
+
+        UserAccount userAccount = new UserAccount();
+        userAccount.setName(signupRequest.getName());
+        userAccount.setUsername(signupRequest.getUsername());
+        userAccount.setAge(signupRequest.getAge());
+        userAccount.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+
+        Set<String> roles = signupRequest.getRole();
+        Set<Authorities> authorities = new HashSet<>();
+        for(String role: roles) {
+            Authorities authority = new Authorities();
+            authority.setAuthority(role);
+            authority.setUserAccount(userAccount);
+            authorities.add(authority);
+        }
+        userAccount.setAuthorities(authorities);
 
         userAccountDetailsService.saveUser(userAccount);
 
