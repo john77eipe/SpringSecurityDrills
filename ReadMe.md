@@ -584,9 +584,7 @@ Let's not get confused with the "token" terminology.
 
 
 
-Remember Me cookie with more security is Persisted Spring Security have a look here:
-
-https://github.com/eugenp/tutorials/tree/master/spring-security-modules/spring-security-mvc-persisted-remember-me
+If you want Remember Me cookie with more security then go for Persisted Spring Security have a look here: https://github.com/eugenp/tutorials/tree/master/spring-security-modules/spring-security-mvc-persisted-remember-me
 
 ## Part 6:  Secure REST (Stateless Sessions)
 
@@ -600,14 +598,14 @@ There are multiple options to choose from:
 
 A good comparison post is [here](https://www.securitydrops.com/the-web-api-authentication-guide/)
 
-### Stateful to Stateless : Simple approach 
+### Stateful to Stateless : Simple approach : Custom non-standard token
 
 If you already have a web app based on Stateful sessions then most obvious idea would be to send our session object’s content **back to the client** and have them stored in, say, a cookie. They would of course be **encrypted by the server** before sending, so that no prying eyes would be able to read them.
 When querying the server, the client would send that encrypted cookie along with the intended request. The server would then decrypt the cookie’s content and consequently verify the obtained credentials. Since the server had previously encrypted the cookie’s content using its own **secret key**, we are pretty sure that the credentials obtained are authentic unless the secret key is leaked, that is.
 
 This approach has been made pretty much straightforward thanks to contributions [like this one](https://github.com/lawrence0819/java-stateless-http-session), which allows you to intercept the session’s content, encrypt it and send it to the browser as a cookie.
 
-### Stateful to Stateless : JWT approach
+### Stateful to Stateless : Complex approach : JWT token
 
 JWT is nothing is mostly same as above but in a standardized approach.
 
@@ -621,7 +619,151 @@ One of the major advantages of JWT compared to session content’s serialization
 
  Just point your browser to https://jwt.io/ and have a look at the amount and variety of libraries available to generate, sign and verify JWT tokens! 
 
+### JWT
 
+JWTs (pronounced “jots”) are URL-safe, encoded, cryptographically signed (sometimes encrypted) strings that can be used as tokens in a variety of applications.  JWT can beused as a CSRF too. The following explanation from [baeldung](https://www.baeldung.com/).
+
+#### Structure of JWT
+
+You may have noticed that there are three distinct sections separated by periods (`.`):
+
+`eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJlNjc4ZjIzMzQ3ZTM0MTBkYjdlNjg3Njc4MjNiMmQ3MCIsImlhdCI6MTQ2NjYzMzMxNywibmJmIjoxNDY2NjMzMzE3LCJleHAiOjE0NjY2MzY5MTd9.rgx_o8VQGuDa2AqCHSgVOD5G68Ld_YYM7N7THmvLIKc`
+
+| Section   | Value                                                        |
+| --------- | ------------------------------------------------------------ |
+| Header    | eyJhbGciOiJIUzI1NiJ9                                         |
+| Payload   | eyJqdGkiOiJlNjc4ZjIzMzQ3ZTM0MTBkYjdlNjg3Njc4MjNiMmQ3MCIsImlhdC<br/>I6MTQ2NjYzMzMxNywibmJmIjoxNDY2NjMzMzE3LCJleHAiOjE0NjY2MzY5MTd9 |
+| Signature | rgx_o8VQGuDa2AqCHSgVOD5G68Ld_YYM7N7THmvLIKc                  |
+
+Each section is [base64](https://en.wikipedia.org/wiki/Base64) URL-encoded. This ensures that it can be used safely in a URL (more on this later). Let's take a closer look at each section individually.
+
+##### **2.1. The Header**
+
+If you base64 to decode the header, you will get the following JSON string:
+
+```javascript
+{"alg":"HS256"}
+```
+
+This shows that the JWT was signed with [HMAC](https://en.wikipedia.org/wiki/Hash-based_message_authentication_code) using [SHA-256](https://en.wikipedia.org/wiki/SHA-2).
+
+##### **2.2. The Payload**
+
+If you decode the payload, you get the following JSON string (formatted for clarity):
+
+```json
+{
+  "jti": "e678f23347e3410db7e68767823b2d70",
+  "iat": 1466633317,
+  "nbf": 1466633317,
+  "exp": 1466636917
+}
+```
+
+Within the payload, as you can see, there are a number of keys with values. These keys are called “claims” and the [JWT specification](https://tools.ietf.org/html/rfc7519#section-4.1) has seven of these specified as “registered” claims. They are:
+
+| iss  | Issuer     |
+| ---- | ---------- |
+| sub  | Subject    |
+| aud  | Audience   |
+| exp  | Expiration |
+| nbf  | Not Before |
+| iat  | Issued At  |
+| jti  | JWT ID     |
+
+When building a JWT, you can put in any custom claims you wish. The list above simply represents the claims that are reserved both in the key that is used and the expected type. The expiration time is exactly one minute past the issued at time.
+
+##### **2.3. The Signature**
+
+Finally, the signature section is created by taking the header and payload together (with the . in between) and passing it through the specified algorithm (HMAC using SHA-256, in this case) along with a known secret. Note that the secret is *always* a byte array, and should be of a length that makes sense for the algorithm used. Below, I use a random base64 encoded string (for readability) that's converted into a byte array.
+
+It looks like this in pseudo-code:
+
+```javascript
+computeHMACSHA256(
+    header + "." + payload, 
+    base64DecodeToByteArray("4pE8z3PBoHjnV1AhvGk+e8h2p+ShZpOnpr8cwHmMh1w=")
+)
+```
+
+As long as you know the secret, you can generate the signature yourself and compare your result to the signature section of the JWT to verify that it has not been tampered with. Technically, a JWT that's been cryptographically signed is called a [JWS](https://tools.ietf.org/html/rfc7515). JWTs can also be encrypted and would then be called a [JWE](https://tools.ietf.org/html/rfc7516). (In actual practice, the term JWT is used to describe JWEs and JWSs.)
+
+https://www.baeldung.com/java-json-web-tokens-jjwt
+
+There were few issues to get the code working
+
+1. the secret key size was below 256 bits
+
+   HMAC256 requires key size to be equal or greater. Most examples online shows secret as a few character length word - which is incorrect and unsafe.
+
+2. some of the methods were deprecated, like `JwtBuilder signWith(SignatureAlgorithm var1, String var2);`
+
+   I changed my code to use a standard approach.
+
+Both the points are discussed [here](https://stackoverflow.com/questions/40252903/static-secret-as-byte-key-or-string). 
+
+Note: 
+
+When using JWT token for **microservice authentication/authorization** it is advisable to sign with RSA Private/Public Keys instead of using Shared HMAC Secret. The token is generated and signed by a central authority (usually an Authorization Server) and each microservice can validate the JWT token using the Public Key exposed from Authorization Server.
+
+```sh
+$ openssl genrsa -out key.pem 2048
+Generating RSA private key, 2048 bit long modulus
+..........+++
+..........................................................................+++
+e is 65537 (0x10001)
+```
+
+```sh
+$ openssl rsa -in key.pem -outform PEM -pubout -out public.pem
+writing RSA key
+```
+
+The key.pem file contains the private key generated using RSA and public.pem file contains public key.
+
+And in code you will essentially do `.signWith(privateKey)`
+
+The private key generated as follows:
+
+```java
+String rsaPrivateKey = "-----BEGIN PRIVATE KEY-----" +
+  "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDK7c0HtOvefMRM" +
+  "s1tkdiJm+A16Df85lQlmXjQvMHNgY4P/znvl4kRON9DdBdo3K81OG7pR/0H9XvdB" +
+  ....
+  "NdPhTRVIAWhil7rFWANOO3Gw2KrMy6O1erW7sAjQlZECgYBmjXWzgasT7JcHrP72" +
+  "fqrEx4cg/jQFNlqODNb515tfXSBBoAFiaxWJK3Uh/60/I6cFL/Qoner4trNDWSNo" +
+  "YENBqXLZnWGfIo0vAIgniJ6OD67+1hEQtbenhSfeE8Hou2BnFOTajUxmYgGm3+hx" +
+  "h8TPOvfHATdiwIm7Qu76gHhpzQ==" +
+  "-----END PRIVATE KEY-----";
+
+rsaPrivateKey = rsaPrivateKey.replace("-----BEGIN PRIVATE KEY-----", "");
+rsaPrivateKey = rsaPrivateKey.replace("-----END PRIVATE KEY-----", "");
+
+PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(rsaPrivateKey));
+KeyFactory kf = KeyFactory.getInstance("RSA");
+PrivateKey privateKey = kf.generatePrivate(keySpec);
+```
+
+To validate you then do `.setSigningKey(publicKey)`
+
+```java
+String rsaPublicKey = "-----BEGIN PUBLIC KEY-----" +
+  "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyu3NB7Tr3nzETLNbZHYi" +
+  "ZvgNeg3/OZUJZl40LzBzYGOD/8575eJETjfQ3QXaNyvNThu6Uf9B/V73QUxKI4/+" +
+  "rwlbjA3niIga4MdDiY4b9K/KFA+HedvtZF1yE2p4smXGydPLOLBe31EgriGTob78" +
+  "EE3f7SMFxlNaqn4Pm7KJkOodnMz0ilwLseeL1IkTtiFn/2OrcMpPHMtTxyDn3pQl" +
+  "VCeJM5j/grDh+0YdyTMGdDHOBgM53VqSsDVyo1TNtP2yhPRYCIiI85hEHVaUnVM9" +
+  "jGwCjNZLJHWh10Mrmh6B3z8BEmLhMAZXeL4fQBjBd42DLvIIJwM1USKFhjK+XghN" +
+  "rQIDAQAB" +
+  "-----END PUBLIC KEY-----";
+rsaPublicKey = rsaPublicKey.replace("-----BEGIN PUBLIC KEY-----", "");
+rsaPublicKey = rsaPublicKey.replace("-----END PUBLIC KEY-----", "");
+X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(rsaPublicKey));
+KeyFactory kf = KeyFactory.getInstance("RSA");
+PublicKey publicKey = kf.generatePublic(keySpec);
+return publicKey;
+}
+```
 
 
 
