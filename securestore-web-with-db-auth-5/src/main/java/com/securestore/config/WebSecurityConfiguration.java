@@ -59,22 +59,23 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
 
-		RememberMeServices rememberMeServices = new CustomTokenBasedRememberMeServices("uniqueAndSecret", userDetailsService);
+//		RememberMeServices rememberMeServices = new CustomTokenBasedRememberMeServices("uniqueAndSecret", userDetailsService);
     	
 		//Note that the order of the antMatchers() elements is significant 
 		//the more specific rules need to come first, followed by the more general ones
 		httpSecurity
 		.csrf().disable()
-				.addFilterBefore(
-						new RememberMeAuthenticationFilter(
-								authenticationManagerBean(),
-								rememberMeServices), RememberMeAuthenticationFilter.class)
 				.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+//				.addFilterBefore(
+//						new RememberMeAuthenticationFilter(
+//								authenticationManagerBean(),
+//								rememberMeServices), RememberMeAuthenticationFilter.class)
 		.authorizeRequests()
 			.antMatchers("/rest/user/**").hasAnyRole("USER", "ADMIN", "SUPERADMIN")
 			.antMatchers("/userPage/**").hasAnyRole("USER", "ADMIN")
 	        .antMatchers("/adminPage/**").hasRole("ADMIN")
 	        .antMatchers("/loginPage").permitAll()
+			.antMatchers("/register/**").permitAll()
 	        .antMatchers("/**", "/css/**", "/js/**", "/images/**").permitAll()
 	        .and()
 	        .formLogin()
@@ -90,12 +91,20 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 			.and()
 				.rememberMe()
 				.rememberMeParameter("rememberMe")
-				.rememberMeServices(rememberMeServices)
+				.rememberMeServices(customTokenBasedRememberMeServices())
 			.and()
 				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 			.and()
 				.sessionManagement().maximumSessions(1);
     }
+
+	@Bean
+	public CustomTokenBasedRememberMeServices customTokenBasedRememberMeServices(){
+		CustomTokenBasedRememberMeServices rememberMeServices = new CustomTokenBasedRememberMeServices("uniqueAndSecret", userDetailsService);
+		rememberMeServices.setParameter("rememberMe");
+		//rememberMeServices.setTokenValiditySeconds(1209600);
+		return rememberMeServices;
+	}
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {

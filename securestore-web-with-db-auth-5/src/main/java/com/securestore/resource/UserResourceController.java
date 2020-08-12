@@ -1,7 +1,9 @@
 package com.securestore.resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.securestore.domain.Authorities;
 import com.securestore.domain.UserAccount;
+import com.securestore.dto.SignupRequest;
 import com.securestore.service.impl.UserAccountDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -11,11 +13,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Controller
@@ -25,6 +30,8 @@ public class UserResourceController {
     @Autowired
     UserAccountDetailsServiceImpl userAccountDetailsService;  //Service which will do all data retrieval/manipulation work
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     //-------------------Retrieve All Users--------------------------------------------------------
 
@@ -59,18 +66,31 @@ public class UserResourceController {
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> createUser(@RequestBody UserAccount user, UriComponentsBuilder ucBuilder) {
-        System.out.println("Creating User " + user.getName());
+    public ResponseEntity<Void> createUser(@RequestBody SignupRequest signupRequest, UriComponentsBuilder ucBuilder) {
+        System.out.println("Creating User " + signupRequest.getName());
 
-        if (userAccountDetailsService.isUserExist(user)) {
-            System.out.println("A User with name " + user.getName() + " already exist");
+        if (userAccountDetailsService.isUserExistByUsername(signupRequest.getUsername())) {
+            System.out.println("A User with name " + signupRequest.getName() + " already exist");
             return new ResponseEntity<Void>(HttpStatus.CONFLICT);
         }
 
-        userAccountDetailsService.saveUser(user);
+        UserAccount userAccount = new UserAccount();
+        userAccount.setName(signupRequest.getName());
+        userAccount.setUsername(signupRequest.getUsername());
+        userAccount.setAge(signupRequest.getAge());
+        userAccount.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
+
+        Authorities authority = new Authorities();
+        authority.setAuthority("ROLE_USER"); //default role
+        Set<Authorities> authorities = new HashSet<>();
+        authority.setUserAccount(userAccount);
+        authorities.add(authority);
+        userAccount.setAuthorities(authorities);
+
+        userAccountDetailsService.saveUser(userAccount);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(user.getId()).toUri());
+        //headers.setLocation(ucBuilder.path("/user/{id}").buildAndExpand(userAccount.getId()).toUri());
         return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
     }
 

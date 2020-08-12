@@ -77,6 +77,17 @@ public class UserAccountDetailsServiceImpl implements UserAccountDetailsService 
 	}
 
 	@Override
+	public boolean isUserExistByUsername(String username) {
+		boolean userExists = false;
+		if(!StringUtils.isEmpty(username)) {
+			if (userRepository.findByUsername(username) != null) {
+				userExists = true;
+			}
+		}
+		return userExists;
+	}
+
+	@Override
 	public void saveUser(UserAccount user) {
 		userRepository.save(user);
 	}

@@ -14,6 +14,8 @@ public interface UserAccountDetailsService extends UserDetailsService {
 
     boolean isUserExist(UserAccount user);
 
+    boolean isUserExistByUsername(String username);
+
     void saveUser(UserAccount user);
 
     void updateUser(UserAccount currentUser);
