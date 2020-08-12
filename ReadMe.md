@@ -285,7 +285,7 @@ Checkout the project: **securestore-web-with-db-auth-3**
 
 
 
-## Part 4: Secure Web and HTTP(Ajax) endpoints with DB Authentication and Authorization with encryption; CSRF; Remember-Me Cookie
+## Part 4: Secure Web and HTTP(Ajax) endpoints with DB Authentication and Authorization with encryption; User Registration; CSRF; Remember-Me Cookie
 
 The same as above but with rest endpoints added. 
 
@@ -428,6 +428,12 @@ Note that I have enabled it in this project alone. Enabling it is as simple as r
 CSRF is not needed for stateless session setup like token authorisation (eg.  JWT). It can be disabled.
 
 For testing CSRF have a look [here](https://www.baeldung.com/spring-security-csrf).
+
+#### User Registration
+
+This is straight forward. Adding the register form and register endpoints made it happen.
+
+For adding more custom password validations: https://stackabuse.com/spring-custom-password-validation/
 
 Checkout the project: **securestore-web-with-db-auth-4**.
 

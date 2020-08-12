@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -24,6 +25,9 @@ public class UserResourceController {
 
     @Autowired
     UserAccountDetailsServiceImpl userAccountDetailsService;  //Service which will do all data retrieval/manipulation work
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     //-------------------Retrieve All Users--------------------------------------------------------
@@ -66,7 +70,7 @@ public class UserResourceController {
             System.out.println("A User with name " + user.getName() + " already exist");
             return new ResponseEntity<Void>(HttpStatus.CONFLICT);
         }
-
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userAccountDetailsService.saveUser(user);
 
         HttpHeaders headers = new HttpHeaders();

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.securestore.domain.CustomSecurityUser;
 import com.securestore.domain.UserAccount;
 import com.securestore.repository.UserRepository;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ public class UserAccountDetailsServiceImpl implements UserAccountDetailsService 
 	
 	@Autowired
 	private UserRepository userRepository;
+
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -52,6 +54,17 @@ public class UserAccountDetailsServiceImpl implements UserAccountDetailsService 
 			userExists = userRepository.existsById(user.getId());
 		} else {
 			if (userRepository.findByUsername(user.getUsername()) != null) {
+				userExists = true;
+			}
+		}
+		return userExists;
+	}
+
+	@Override
+	public boolean isUserExistByUsername(String username) {
+		boolean userExists = false;
+		if(!StringUtils.isEmpty(username)) {
+			if (userRepository.findByUsername(username) != null) {
 				userExists = true;
 			}
 		}
