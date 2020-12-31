@@ -937,7 +937,7 @@ Controller and handlers not getting registered correctly
 
 
 
-References:
+References and Links:
 
 Stackoverflow, https://www.baeldung.com/
 
@@ -953,5 +953,16 @@ To run both as separate service:
 
 https://medium.com/@supunbhagya/spring-oauth2-resourceserver-oauth2-security-authorization-code-grant-flow-9eb72fd5d27d
 
+Links:
 https://github.com/teemodevs
-
+https://shekhargulati.com/2018/02/15/single-sign-on-in-spring-boot-applications-with-spring-security-oauth/
+https://alexbilbie.com/guide-to-oauth-2-grants/
+https://tools.ietf.org/html/rfc6749#section-4.1.1
+https://projects.spring.io/spring-security-oauth/docs/oauth2.html
+http://www.zakariaamine.com/2018-03-01/using-oauth2-in-spring-scopes
+https://medium.com/securing/what-is-going-on-with-oauth-2-0-and-why-you-should-not-use-it-for-authentication-5f47597b2611
+https://github.com/patternmatch/oauth2-blog/tags
+https://github.com/HeshamOsman/spring-oauth-sso
+https://github.com/hkurosu/oauth2-sso-samples
+https://github.com/making/oauth2-sso-demo
+https://dzone.com/articles/spring-boot-oauth2-getting-the-authorization-code
