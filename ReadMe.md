@@ -159,9 +159,9 @@ public abstract class WebSecurityConfigurerAdapter implements
 When it comes to authentication and Spring Security you have roughly three scenarios:
 
 1. The **default**: You *can* access the (hashed) password of the user, because you have his details (username, password) saved in e.g. file/database/in-memory.
-	In this approach we provide an implementation of `UserDetailsService` and override `loadUserByUsername` method to return an object of  type `UserDetails`
+    In this approach we provide an implementation of `UserDetailsService` and override `loadUserByUsername` method to return an object of  type `UserDetails`
 2. **Custom or ThirdParty**: You *cannot* access the (hashed) password of the user. This is the case if your users and passwords are stored *somewhere* else, like in a 3rd party identity management product offering REST services for authentication. Think: [Atlassian Crowd](https://www.atlassian.com/software/crowd).
-	If that is the case, you cannot use a UserDetailsService anymore, instead you need to implement and provide an `AuthenticationProvider` by implementing `AuthenticationProvider` interface.  We then override the `authenticate` method to return an object of type `UsernamePasswordAuthenticationToken`.
+    If that is the case, you cannot use a UserDetailsService anymore, instead you need to implement and provide an `AuthenticationProvider` by implementing `AuthenticationProvider` interface.  We then override the `authenticate` method to return an object of type `UsernamePasswordAuthenticationToken`.
 3. **OAuth**: You want to use OAuth2 or "Login with Google/Twitter/etc." (OpenID), likely in combination with JWT. 
 
 
@@ -584,15 +584,19 @@ Let's not get confused with the "token" terminology.
 
    Check this to know more about it: https://www.baeldung.com/spring-mvc-cache-headers
 
-#### Remember Me cookie when custom authentication is in place  
+#### Remember Me cookie when custom authentication  
 
-> In progress
+> Getting the exisitng Remember Me cookie to work with custon authentication In progress. Note that this feature alone won't work in  **securestore-web-with-db-auth-4**.
+
+I have raised this as a [stackoverflow question](https://stackoverflow.com/questions/63325459/spring-remember-me-cookie-doesnt-work-for-custom-authentication-provider). If you want Remember Me cookie with more security then go for Persisted Spring Security have a look here: https://github.com/eugenp/tutorials/tree/master/spring-security-modules/spring-security-mvc-persisted-remember-me
+
+Checkout the project: **securestore-web-with-db-auth-5**.
 
 
-
-If you want Remember Me cookie with more security then go for Persisted Spring Security have a look here: https://github.com/eugenp/tutorials/tree/master/spring-security-modules/spring-security-mvc-persisted-remember-me
 
 ## Part 6:  Secure REST (Stateless Sessions)
+
+Checkout the project: **securestore-rest-with-db-auth-6**.
 
 There are multiple options to choose from:
 
@@ -771,6 +775,8 @@ return publicKey;
 }
 ```
 
+Checkout the project: **securestore-rest-with-db-auth-6**.
+
 
 
 ## Part 7: Secure OAuth (DB Authentication and Authorization with encryption)
@@ -794,6 +800,8 @@ OAuth terms (taken from the core spec):
 - **Client** - An application making protected resource requests on behalf of the resource owner and with its authorization. The term client does not imply any particular implementation characteristics (e.g. whether the application executes on a server, a desktop, or other devices).
 - **Authorization server** - The server issuing access tokens to the client after successfully authenticating the resource owner and obtaining authorization.
 
+Below explanation from [DZone](https://dzone.com/articles/an-oauth2-grant-selection-decision-tree-for-securi) and [AlexBilbie](https://alexbilbie.com/tag/oauth/)
+
 #### Abstract Protocol Overview
 
 ![img](./1*xcp97z1I3jHUSFtv4nKtYg.png)
@@ -816,6 +824,13 @@ First, the client application makes an authorization request by redirecting the 
 - `scope` a space delimited list of scopes
 - `state` with a [CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery) token. This parameter is optional but highly recommended. You should store the value of the CSRF token in the user’s session to be validated when they return.
 
+```bash
+GET /authorize?response_type=code         
+&client_id=s6BhdRkqt3&state=xyz         
+&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+Host: server.example.com
+```
+
 ##### **Step B: User Authentication**
 
 Then, the user will be prompted to log in, either on the authorization server itself or by federating to a third party identity provider.
@@ -827,7 +842,11 @@ If the user approves the client they will be redirected from the authorisation s
 - `code` with the authorization code
 - `state` with the state parameter sent in the original request. You should compare this value with the value stored in the user’s session to ensure the authorization code obtained is in response to requests made by this client rather than another client application.
 
-
+```bash
+HTTP/1.1 302 Found
+Location: https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA               
+&state=xyz
+```
 
 ##### **Step D: Access Token Request**
 
@@ -841,7 +860,15 @@ POST request to the authorization server with the following parameters:
 - `redirect_uri` with the same redirect URI the user was redirect back to
 - `code` with the authorization code from the query string
 
-
+```bash
+POST /token HTTP/1.1
+Host: server.example.com
+Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+Content-Type: application/x-www-form-urlencoded
+grant_type=authorization_code     
+&code=SplxlOBeZQQYbYS6WxSbIA     
+&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb
+```
 
 ##### **Step E: Access Token Response**
 
@@ -852,15 +879,120 @@ If the token request is valid, the authorization server will respond with a JSON
 - `access_token` the access token itself
 - `refresh_token` a refresh token that can be used to acquire a new access token when the original expires
 
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+Pragma: no-cache
+{   "access_token":"2YotnFZFEjr1zCsicMWpAA",   
+    "token_type":"example",   
+    "expires_in":3600,   
+    "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA",   
+    "example_parameter":"example_value"
+}
+```
+
 ##### **Step F: Resource Request**
 
 Thereafter, the client application will use the access token for requesting resources hosted on the resource server by adding the authorization header.
 
-```
+```bash
+GET /example/resource HTTP/1.1
+Host: server.example.com
 Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
 ```
 
 
+
+#### Client Credentials Grant
+
+![](./1_jN4zePKhl9C34tLeVcIdyw.png)
+
+The Client Credentials Grant might be the simplest grant in OAuth2 specification. It has been designed to be used for machine to machine communication where the end user identification is not necessary for resource authorization. 
+
+In this approach, the client application itself acts as the resource owner and make use of the client credentials for obtaining access tokens:
+
+##### **Step A: Authentication Request**
+
+First, the client application makes an authorization request to the authorization server by providing the client credentials in the Authorization header and the grant type in the message body:
+
+```bash
+POST /token HTTP/1.1     
+Host: server.example.com     
+Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW     
+Content-Type: application/x-www-form-urlencoded
+grant_type=client_credentials
+```
+
+##### **Step B: Authentication Response**
+
+If the authentication request is successful, the authorization server will respond with an access token, access token expiration time, and any other application specific parameters:
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+Pragma: no-cache
+{   "access_token":"2YotnFZFEjr1zCsicMWpAA",   
+    "token_type":"example",   
+    "expires_in":3600,   
+    "example_parameter":"example_value"
+}
+```
+
+##### **Step C: Resource Request:**
+
+Thereafter, the client application will use the access token for requesting resources hosted on the resource server:
+
+```bash
+GET /example/resource HTTP/1.1
+Host: server.example.com
+Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
+```
+
+
+
+#### Implicit Grant
+
+![1_X11NuSKmSn3pui6-aiyLWA](./1_X11NuSKmSn3pui6-aiyLWA.png)
+
+The Implicit Grant has been designed for client applications such as client-side web applications that download its code and executes on a web browser which cannot securely store its client credentials. Unlike the Authorization Code Grant, this does not use client credentials for authenticating the client application. Instead, it relies on one the resource owner authentication for providing the access token.
+
+##### **Step A: Authorization Request**
+
+First, the client application will make an authorization request to the authorization server by specifying the response type, client id, state (an opaque value such as a CSRF token for preventing cross-site request forgery attacks) and the redirection URL:
+
+```bash
+GET /authorize?response_type=token        
+&client_id=s6BhdRkqt3        
+&state=xyz        
+&redirect_uri=https%3A%2F%2Fclient%2Eexample%2Ecom%2Fcb HTTP/1.1
+Host: server.example.com
+```
+
+##### **Step B: User Authentication**
+
+Then, the user will be prompted to log in, either on the authorization server itself or by federating to a third party identity provider.
+
+##### **Step C: Access Token Response**
+
+Once the authentication is successful, the authorization server will respond with an access token, state, token type, and token expiration time:
+
+```bash
+HTTP/1.1 302 Found
+Location: http://example.com/cb#access_token=2YotnFZFEjr1zCsicMWpAA               
+&state=xyz&token_type=example&expires_in=3600
+```
+
+##### **Step D: Resource Request**
+
+Thereafter, the client application will use the access token for requesting resources hosted on the resource server:
+
+```bash
+GET /example/resource HTTP/1.1
+Host: server.example.com
+Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
+```
 
 #### Resource owner credentials grant
 
@@ -879,7 +1011,13 @@ First, the client application will make an authentication request to the authori
 - `username` with the user’s username
 - `password` with the user’s password
 
-
+```bash
+POST /token HTTP/1.1
+Host: server.example.com
+Authorization: Basic czZCaGRSa3F0MzpnWDFmQmF0M2JW
+Content-Type: application/x-www-form-urlencoded
+grant_type=password&username=johndoe&password=A3ddj3w
+```
 
 ##### **Step B: Access Token Response**
 
@@ -890,9 +1028,63 @@ The authorization server will respond with a JSON object containing the followin
 - `access_token` the access token itself
 - `refresh_token` a refresh token that can be used to acquire a new access token when the original expires
 
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=UTF-8
+Cache-Control: no-store
+Pragma: no-cache
+{   "access_token":"2YotnFZFEjr1zCsicMWpAA",   
+    "token_type":"example",   
+    "expires_in":3600,   
+    "refresh_token":"tGzv3JOkF0XG5Qx2TlKWIA",   
+    "example_parameter":"example_value"
+}
+```
+
 ##### **Step C: Resource Request**
 
 Thereafter, the client application will use the access token for requesting resources hosted on the resource server by specifying it in the Authorization header.
+
+```bash
+GET /example/resource HTTP/1.1
+Host: server.example.com
+Authorization: Bearer 2YotnFZFEjr1zCsicMWpAA
+```
+
+
+
+### Refresh Token Workflow
+
+Once an access token is obtained using one of the above grants, it has been designed to expire after the given token expiration time for providing additional security. Due to this design, the client application will need to use the refresh token for obtaining a new token when the existing token expires. Even though this can be implemented by using a timer on the client application for obtaining a new token when the expiration time occurs, the best practice is to make an additional call to obtain a new token when the authorization server responds with the invalid token error.
+
+![1_DU-2Xafpyun8xNFLTfsdIw](./1_DU-2Xafpyun8xNFLTfsdIw.png)
+
+The following is a sample HTTP POST request for obtaining a new access token using the refresh token:
+
+```bash
+POST /token HTTP/1.1
+Host: server.example.com 
+grant_type=refresh_token
+&client_id=3MVG9lKcPoNINVBIPJjdw1J9LLM82HnFVV
+&client_secret=12312342342wefsdfsf3241334
+&refresh_token=tGzv3JOkF0XG5Qx2TlKWIA
+```
+
+### Grant Selection Decision Tree
+
+According to the OAuth2 specification, the grant selection for securing an API using OAuth2 can be taken based on the requirements for end user identification, client type (server-side web application, native application, client-side web application) and the level of trust the resource owner would have on the client application:
+
+![1_gbLB8x90pMPRo3UWbx5wug](./1_gbLB8x90pMPRo3UWbx5wug.png)
+
+
+
+If the resource server does not require identifying the end user who interacts with the client application, and if the client application itself acts as the resource owner it can use the Client Credentials Grant. In this approach, the client application only requires client credentials for issuing access tokens and it does not keep track of the end user. This approach would be suitable for server-to-server communication.
+
+If the end user identification is needed in the resource server for authorization, and if the client is either a server-side web application or a native application accessed by third party users, the OAuth2 specification recommends using the Authorization Code Grant. This is the most recommended grant for securing resources accessed by publicly hosted applications and third-party users due to its design of exchanging authorization codes for access tokens. 
+
+If the end user identification is needed in the resource server for authorization, and if the client application is either a client-side web application or a native mobile or desktop application that is used by the first party, the Resource Owner Password Credentials Grant can be used for obtaining access tokens. In this workflow, both user agent based and native applications do not require-to-store client credentials on their applications. Instead, it makes use of the end user credentials for obtaining the access tokens for increased security. Moreover, it is important to note the requirement of the trust between the resource owners and the client, because users would need to provide their user credentials in the client application itself.
+
+If providing user credentials directly to the client application is a concern and if the authorization is done via a third-party authorization server, the Implicit Grant can be used for client-side web applications which require end-user identification. It will make use of browser redirection to navigate the user to the authorization server and obtain an access token via the response flow.
 
 
 
@@ -943,8 +1135,6 @@ Stackoverflow, https://www.baeldung.com/
 
 https://www.oauth.com/oauth2-servers/accessing-data/
 
-https://dzone.com/articles/an-oauth2-grant-selection-decision-tree-for-securi
-
 This guy talks about Password Grant which can be done using postman (and the same worked for me)
 
 https://www.youtube.com/watch?v=996OiexHze0
@@ -953,7 +1143,7 @@ To run both as separate service:
 
 https://medium.com/@supunbhagya/spring-oauth2-resourceserver-oauth2-security-authorization-code-grant-flow-9eb72fd5d27d
 
-Links:
+
 https://github.com/teemodevs
 https://shekhargulati.com/2018/02/15/single-sign-on-in-spring-boot-applications-with-spring-security-oauth/
 https://alexbilbie.com/guide-to-oauth-2-grants/
@@ -966,3 +1156,4 @@ https://github.com/HeshamOsman/spring-oauth-sso
 https://github.com/hkurosu/oauth2-sso-samples
 https://github.com/making/oauth2-sso-demo
 https://dzone.com/articles/spring-boot-oauth2-getting-the-authorization-code
+
