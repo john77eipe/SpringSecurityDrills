@@ -56,7 +56,7 @@ public class UserResourceController {
 
 
     //-------------------Create a User--------------------------------------------------------
-
+    // -- avoid using this and use UserAuthController
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> createUser(@RequestBody UserAccount user, UriComponentsBuilder ucBuilder) {

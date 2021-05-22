@@ -24,7 +24,7 @@ public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHa
                                         Authentication authentication) throws IOException, ServletException {
     	 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 		 for (GrantedAuthority grantedAuthority : authorities) {
-		     if (grantedAuthority.getAuthority().equals("ROLE_HRADMIN")) {
+		     if (grantedAuthority.getAuthority().equals("ROLE_ADMIN")) {
 		    	 redirectStrategy.sendRedirect(httpServletRequest, httpServletResponse, "/adminPage");
 		         break;
 		     } else {

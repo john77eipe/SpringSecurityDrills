@@ -12,7 +12,7 @@ spring:
       oauth2:
           client:
               registration:
-                  custom:
+                  my-auth-server:
                       client-id: my-client
                       client-secret: my-secret
                       authorization-grant-type: authorization_code

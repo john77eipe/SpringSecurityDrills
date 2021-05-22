@@ -46,7 +46,7 @@ public class UserAccountDetailsMockServiceImpl implements UserAccountDetailsServ
 		userAuthorities.setUserAccount(userAccount);
 		authorities.add(userAuthorities);
 		userAuthorities = new Authorities();
-		userAuthorities.setAuthority("ROLE_HRADMIN");
+		userAuthorities.setAuthority("ROLE_ADMIN");
 		userAuthorities.setUserAccount(userAccount);
 		authorities = new HashSet<Authorities>();
 		authorities.add(userAuthorities);

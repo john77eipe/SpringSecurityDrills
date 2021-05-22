@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * @author John Eipe
@@ -38,7 +39,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	@Autowired private AuthenticationSuccessHandler authenticationSuccessHandler;
 	@Autowired private AuthenticationFailureHandler authenticationFailureHandler;
 
-	//@Autowired private PasswordEncoder passwordEncoder1;
+	@Autowired
+    private PasswordEncoder passwordEncoder;
 
 
     @Autowired
@@ -72,30 +74,32 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 	        .deleteCookies("JSESSIONID");*/
 		httpSecurity
             .csrf().disable()
-            .anonymous().disable()
+//            .anonymous().disable()
 
-                .requestMatchers()
-                .antMatchers(HttpMethod.POST, "/login")
-                .antMatchers(HttpMethod.POST, "/logout")
-                .antMatchers("/oauth/authorize")
-                .and()
+//        .requestMatchers()
+//                .antMatchers(HttpMethod.POST, "/login")
+//                .antMatchers(HttpMethod.POST, "/logout")
+//                .antMatchers("/oauth/authorize")
+//                .and()
 
 			.authorizeRequests()
                 .antMatchers("/**", "/css/**", "/js/**", "/images/**").permitAll()
                 .antMatchers("/oauth/token").permitAll()
-            .antMatchers(HttpMethod.GET,"/userPage/*").hasAnyRole("USER", "HRADMIN")
-            .antMatchers(HttpMethod.GET, "/adminPage/*").hasRole("HRADMIN")
+            .antMatchers(HttpMethod.GET,"/userPage/*").hasAnyRole("USER", "ADMIN")
+            .antMatchers(HttpMethod.GET, "/adminPage/*").hasRole("ADMIN")
 
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/")
+                .loginPage("/loginPage")
                 .loginProcessingUrl("/login")
                 .failureHandler(authenticationFailureHandler)
                 .successHandler(authenticationSuccessHandler)
                 .and()
                 .logout()
-                .logoutUrl("/logout");
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout**"))
+                .logoutSuccessUrl("/")
+                .deleteCookies("JSESSIONID");
 
 
 		// @formatter:on
@@ -103,7 +107,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     protected void globalUserDetails(AuthenticationManagerBuilder auth) throws Exception {
-    	auth.userDetailsService(userAccountDetailsService).passwordEncoder(passwordEncoder());
+    	auth.userDetailsService(userAccountDetailsService).passwordEncoder(passwordEncoder);
 		/*auth.inMemoryAuthentication()
 				.withUser("bill").password("{noop}abc123").roles("ADMIN").and()
 				.withUser("bob").password("{noop}abc123").roles("USER");*/

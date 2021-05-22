@@ -25,8 +25,10 @@ import org.springframework.security.oauth2.provider.token.store.InMemoryTokenSto
 @EnableAuthorizationServer
 /**
  * 
- * @EnableAuthorizationServer annotation imports two configuration classes — AuthorizationServerEndpointsConfiguration and AuthorizationServerSecurityConfiguration.
- * The AuthorizationServerEndpointsConfiguration configuration class create beans for three REST controllers — AuthorizationEndpoint, TokenEndpoint, and CheckTokenEndpoint. 
+ * @EnableAuthorizationServer annotation imports two configuration classes —
+ * AuthorizationServerEndpointsConfiguration and AuthorizationServerSecurityConfiguration.
+ * The AuthorizationServerEndpointsConfiguration configuration class create beans for three REST controllers —
+ * AuthorizationEndpoint, TokenEndpoint, and CheckTokenEndpoint.
  * These three controllers provide implementations for endpoints specified in OAuth2 specification.
  * The AuthorizationServerSecurityConfiguration configuration class configures Spring Security for OAuth endpoints.
  * @author johne
@@ -69,8 +71,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
                 .secret(passwordEncoder1.encode(CLIENT_SECRET))
                 .accessTokenValiditySeconds(120)
                 .refreshTokenValiditySeconds(600)
-                .autoApprove(true)
-                .redirectUris("http://localhost:8082/app1/login/oauth2/code/my-auth-server", "http://localhost:8083/app2/login/oauth2/code/my-auth-server");
+                .autoApprove(true);
+                //.redirectUris("http://localhost:8082/app1/login/oauth2/code/my-auth-server", "http://localhost:8083/app2/login/oauth2/code/my-auth-server");
         //redirect uris matter only for authorization_code and not for password grant type
         //Refresh token is only valid for 10 minutes.
     }

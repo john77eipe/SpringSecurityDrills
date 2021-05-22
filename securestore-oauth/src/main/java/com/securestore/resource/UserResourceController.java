@@ -73,7 +73,7 @@ public class UserResourceController {
     //-------------------Retrieve All Users--------------------------------------------------------
 
     @RequestMapping(value = "/user/all", method = RequestMethod.GET)
-    @PreAuthorize("hasRole('HRADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserAccount>> listAllUsers() {
         List<UserAccount> users = userAccountDetailsService.findAllUsers();
         if (users.isEmpty()) {
@@ -102,7 +102,7 @@ public class UserResourceController {
     //-------------------Create a User--------------------------------------------------------
 
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    @PreAuthorize("hasRole('HRADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> createUser(@RequestBody UserAccount user, UriComponentsBuilder ucBuilder) {
         System.out.println("Creating User " + user.getName());
 

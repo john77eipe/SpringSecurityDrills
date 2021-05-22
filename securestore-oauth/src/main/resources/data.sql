@@ -26,7 +26,7 @@ INSERT INTO user_account VALUES (1,12,'john','$2a$10$k6X3EmKLqzJ.cqKyzOqNMOrxfDO
 
 INSERT INTO authorities VALUES (1,'ROLE_USER',1),
                                (2,'ROLE_USER',2),
-                               (3,'ROLE_HRADMIN',2);
+                               (3,'ROLE_ADMIN',2);
 
 
 

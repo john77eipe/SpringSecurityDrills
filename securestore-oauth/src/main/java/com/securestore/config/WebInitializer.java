@@ -5,6 +5,9 @@ import javax.servlet.Filter;
 import com.securestore.ApplicationOAuth1;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
+/**
+ * This is no more needed in new Spring boot
+ */
 public class WebInitializer { /*extends AbstractAnnotationConfigDispatcherServletInitializer {
 
     @Override

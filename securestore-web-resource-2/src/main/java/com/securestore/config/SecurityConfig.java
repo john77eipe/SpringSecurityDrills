@@ -31,8 +31,7 @@ import java.util.List;
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Value("${spring.security.oauth2.client.provider.my-auth-server.logoutSuccessUrl}")
-    private String logoutSuccessUrl;
+
 
     @Autowired
     private OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
@@ -40,20 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .antMatcher("/**")
-                .authorizeRequests()
-                .antMatchers("/", "/login**")
-                .permitAll()
-                .and()
-                .oauth2Login()
-                .userInfoEndpoint()
-                .customUserType(CustomOAuth2User.class, "custom")
-                .userService(oAuth2UserService);
-
-        http
-                .logout()
-                .logoutSuccessUrl(logoutSuccessUrl);
+                .authorizeRequests().anyRequest().authenticated();
 
         http
                 .headers()
